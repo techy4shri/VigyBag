@@ -18,11 +18,9 @@ function CustomizedGifts() {
     const fetchData = async () => {
       try {
         const categoriesToFetch = ["tops", "womens-watches", "mens-watches", "mobile-accessories", "sports-accessories", "motorcycle", "vehicle"]; // desired categories
-        let allProducts = [];
-
-        // Fetch products from each category
-        for (let category of categoriesToFetch) {
-          const response = await axios.get(`https://dummyjson.com/products/category/${category}`);
+        const productPromises = categoriesToFetch.map(category => axios.get(`https://dummyjson.com/products/category/${category}`) );
+        const responses = await Promise.all(productPromises); let allProducts = []; 
+        responses.forEach(response => {
           if (response.data && Array.isArray(response.data.products)) {
             const mappedProducts = response.data.products.map((product) => ({
               id: product.id,
@@ -38,7 +36,7 @@ function CustomizedGifts() {
             }));
             allProducts = [...allProducts, ...mappedProducts];
           }
-        }
+        });
 
         setProducts(allProducts);
         setFilteredProducts(allProducts);

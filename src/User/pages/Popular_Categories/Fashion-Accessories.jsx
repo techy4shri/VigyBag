@@ -17,11 +17,9 @@ function FashionAccessories() {
     const fetchData = async () => {
       try {
         const categoriesToFetch = ["womens-dresses", "tops", "mens-shirts", "mens-watches", "womens-watches", "womens-jewellery", "womens-bags", "womens-shoes", "sunglasses", "mens-shoes"]; // desired categories
-        let allProducts = [];
-
-        // Fetch products from each category
-        for (let category of categoriesToFetch) {
-          const response = await axios.get(`https://dummyjson.com/products/category/${category}`);
+        const productPromises = categoriesToFetch.map(category => axios.get(`https://dummyjson.com/products/category/${category}`) );
+        const responses = await Promise.all(productPromises); let allProducts = []; 
+        responses.forEach(response => {
           if (response.data && Array.isArray(response.data.products)) {
             const mappedProducts = response.data.products.map((product) => ({
               id: product.id,
@@ -37,7 +35,7 @@ function FashionAccessories() {
             }));
             allProducts = [...allProducts, ...mappedProducts];
           }
-        }
+        });
 
         setProducts(allProducts);
         setFilteredProducts(allProducts);

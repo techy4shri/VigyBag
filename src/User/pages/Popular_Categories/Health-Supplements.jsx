@@ -5,8 +5,6 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 
-
-
 function HealthSupplements() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -19,11 +17,9 @@ function HealthSupplements() {
     const fetchData = async () => {
       try {
         const categoriesToFetch = ["skin-care"]; // desired categories
-        let allProducts = [];
-
-        // Fetch products from each category
-        for (let category of categoriesToFetch) {
-          const response = await axios.get(`https://dummyjson.com/products/category/${category}`);
+        const productPromises = categoriesToFetch.map(category => axios.get(`https://dummyjson.com/products/category/${category}`) );
+        const responses = await Promise.all(productPromises); let allProducts = []; 
+        responses.forEach(response => {
           if (response.data && Array.isArray(response.data.products)) {
             const mappedProducts = response.data.products.map((product) => ({
               id: product.id,
@@ -39,7 +35,7 @@ function HealthSupplements() {
             }));
             allProducts = [...allProducts, ...mappedProducts];
           }
-        }
+        });
 
         setProducts(allProducts);
         setFilteredProducts(allProducts);
